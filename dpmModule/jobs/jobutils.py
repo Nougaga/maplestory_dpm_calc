@@ -24,6 +24,8 @@ def create_auxilary_attack(skill_wrapper: core.DamageSkillWrapper, ratio=1, name
 
     skill_wrapper.onJustAfter(copial_skill)
 
+def get_equipment_matt(chtr):
+    return chtr.get_equipment_total_matt()
 
 def get_weapon_att(chtr):
     return chtr.get_weapon_base_att()

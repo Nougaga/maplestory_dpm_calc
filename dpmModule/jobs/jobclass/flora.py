@@ -5,9 +5,19 @@ from ...character import characterKernel as ck
 from functools import partial
 
 #레프
-def FloraGoddessBlessWrapper(vEhc, num1, num2, WEAPON_ATT):
+def FloraGoddessBlessWrapper(vEhc, num1, num2, WEAPON_ATT, EQUIPMENT_MATT):
     # 장비 비례 증가 수치는 최대치로 가정
-    FloraGoddessBless = core.BuffSkill("그란디스 여신의 축복(레프)", 480, 40*1000, att = 10 + 3 * vEhc.getV(num1, num2) + 1.5 * WEAPON_ATT, cooltime = 240*1000, red=True).isV(vEhc, num1, num2).wrap(core.BuffSkillWrapper)
+    FloraGoddessBless = (
+        core.BuffSkill(
+            name="그란디스 여신의 축복(레프)", 
+            delay=480, 
+            remain=40 * 1000, 
+            att = 10 + 3 * vEhc.getV(num1, num2) + min(EQUIPMENT_MATT * (0.4 + 0.02 * vEhc.getV(num1, num2)), 1.5 * WEAPON_ATT), 
+            cooltime = 240 * 1000, 
+            red=True)
+            .isV(vEhc, num1, num2)
+            .wrap(core.BuffSkillWrapper)
+    )
     return FloraGoddessBless
 
 # 마나 최대치 유지 가정, 비율에 따라 수치가 어떻게 변동되는지 확인 필요

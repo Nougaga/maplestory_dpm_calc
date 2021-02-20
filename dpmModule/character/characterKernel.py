@@ -167,6 +167,15 @@ class GearedCharacter(AbstractCharacter):
             self.gear_list[key] = gear_dict[key]
             self.add_gear_modifier(gear_dict[key])
 
+    def get_equipment_total_matt(self) -> int:
+        matt = 0
+        for gear_id in self.gear_list:  
+            matt += self.gear_list[gear_id].base_stat[GearPropType.matt] + \
+                    self.gear_list[gear_id].additional_stat[GearPropType.matt] + \
+                    self.gear_list[gear_id].scroll_stat[GearPropType.matt] + \
+                    self.gear_list[gear_id].star_stat[GearPropType.matt]
+        return matt
+
     def get_weapon_base_att(self) -> int:
         weapon_base_stat = self.gear_list["weapon"].base_stat
         return max(weapon_base_stat[GearPropType.att], weapon_base_stat[GearPropType.matt])

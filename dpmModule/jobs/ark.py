@@ -308,9 +308,10 @@ class JobGenerator(ck.JobGenerator):
         LuckyDice = core.BuffSkill("럭키 다이스", 0, 180*1000, pdamage = 20).isV(vEhc,3,4).wrap(core.BuffSkillWrapper)
 
         WEAPON_ATT = jobutils.get_weapon_att(chtr)
+        EQUIPMENT_MATT = jobutils.get_equipment_matt(chtr)
         Overdrive = pirates.OverdriveWrapper(vEhc, 5, 5, WEAPON_ATT)
         MirrorBreak, MirrorSpider = globalSkill.SpiderInMirrorBuilder(vEhc, 0, 0)
-        FloraGoddessBless = flora.FloraGoddessBlessWrapper(vEhc, 0, 0, WEAPON_ATT)
+        FloraGoddessBless = flora.FloraGoddessBlessWrapper(vEhc, 0, 0, WEAPON_ATT, EQUIPMENT_MATT)
     
         MemoryOfSource = core.DamageSkill("근원의 기억", 990, 0, 0, cooltime = 200 * 1000, red=True).isV(vEhc,1,1).wrap(core.DamageSkillWrapper)
         MemoryOfSourceTick = core.DamageSkill("근원의 기억(틱)", 210, 400 + 16 * vEhc.getV(1,1), 6).wrap(core.DamageSkillWrapper)    # 43타
