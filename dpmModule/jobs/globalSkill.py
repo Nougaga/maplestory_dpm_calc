@@ -1,7 +1,7 @@
 from dpmModule.character.characterKernel import AbstractCharacter
 from ..kernel import core
 import math
-
+LEVEL_SPI = 30
 
 def usefulSkillRemain(slevel=1): return (180+slevel*3)*1000
 
@@ -43,7 +43,7 @@ def useful_advanced_bless(slevel=1):
 
 class MirrorBreakWrapper(core.DamageSkillWrapper):
     def __init__(self, vEhc, num1, num2, modifier) -> None:
-        skill = core.DamageSkill("스파이더 인 미러(공간 붕괴)", 720, 450+18*vEhc.getV(num1, num2), 15, cooltime=250*1000, red=True, modifier=modifier).isV(vEhc, num1, num2)
+        skill = core.DamageSkill("스파이더 인 미러(공간 붕괴)", 720, 450+18*LEVEL_SPI, 15, cooltime=250*1000, red=True, modifier=modifier).isV(vEhc, num1, num2)
         super(MirrorBreakWrapper, self).__init__(skill)
 
     def ensure(self, chtr: AbstractCharacter) -> bool:
@@ -55,7 +55,7 @@ class MirrorSpiderWrapper(core.SummonSkillWrapper):
     def __init__(self, vEhc, num1, num2, modifier) -> None:
         self.delays = [900, 850, 750, 650, 5730]  # 400001039.summonedSequenceAttack에서 가져온 딜레이, 5회째 공격 후 눈 감고뜨는 시간 5730ms
         self.hit_count = 0
-        skill = core.SummonSkill("스파이더 인 미러(거울 속의 거미)", 0, 900, 175+7*vEhc.getV(num1, num2), 8, 50*1000, cooltime=-1, modifier=modifier).isV(vEhc, num1, num2)
+        skill = core.SummonSkill("스파이더 인 미러(거울 속의 거미)", 0, 900, 175+7*LEVEL_SPI, 8, 50*1000, cooltime=-1, modifier=modifier).isV(vEhc, num1, num2)
         super(MirrorSpiderWrapper, self).__init__(skill)
 
     def _useTick(self) -> core.ResultObject:

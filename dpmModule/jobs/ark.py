@@ -9,6 +9,12 @@ from .jobclass import flora
 from . import jobutils
 from math import ceil
 from typing import Any, Dict
+from . import seedrings
+
+LEVEL_INF = 30
+LEVEL_FOR = 30
+LEVEL_DEV = 30
+LEVEL_MEM = 30
 
 # TODO: core쪽으로 옮길 것, .wrap()과 함께 사용 가능하게 할 것
 class MultipleDamageSkillWrapper(core.DamageSkillWrapper):
@@ -163,7 +169,10 @@ class JobGenerator(ck.JobGenerator):
 
     def get_ruleset(self):
         ruleset = RuleSet()
-
+        
+        # ruleset.add_rule(ConditionRule('근원의 기억', '인피니티 스펠', lambda x:x.is_cooltime_left(10080, -1)), RuleSet.BASE) # 근원 인피에 맞추는 용도
+        # ruleset.add_rule(ConditionRule('파티 시너지', '인피니티 스펠', lambda x:x.is_cooltime_left(0, 1)), RuleSet.BASE)
+        # ruleset.add_rule(ConcurrentRunRule('리스트레인트 링', '소울 컨트랙트'), RuleSet.BASE)
         ruleset.add_rule(ConditionRule('인피니티 스펠', '근원의 기억', lambda x:x.is_cooltime_left(0, 1)), RuleSet.BASE)
         ruleset.add_rule(ConcurrentRunRule('매직 서킷 풀드라이브(버프)', '인피니티 스펠'), RuleSet.BASE)
         ruleset.add_rule(ConcurrentRunRule("그란디스 여신의 축복(레프)","매직 서킷 풀드라이브(버프)"), RuleSet.BASE)
@@ -314,18 +323,18 @@ class JobGenerator(ck.JobGenerator):
         FloraGoddessBless = flora.FloraGoddessBlessWrapper(vEhc, 0, 0, WEAPON_ATT, EQUIPMENT_MATT)
     
         MemoryOfSource = core.DamageSkill("근원의 기억", 990, 0, 0, cooltime = 200 * 1000, red=True).isV(vEhc,1,1).wrap(core.DamageSkillWrapper)
-        MemoryOfSourceTick = core.DamageSkill("근원의 기억(틱)", 210, 400 + 16 * vEhc.getV(1,1), 6).wrap(core.DamageSkillWrapper)    # 43타
-        MemoryOfSourceEnd = core.DamageSkill("근원의 기억(종결)", 60, 1200 + 48 * vEhc.getV(1,1), 12 * 6).wrap(core.DamageSkillWrapper)
+        MemoryOfSourceTick = core.DamageSkill("근원의 기억(틱)", 210, 400 + 16 * LEVEL_MEM, 6).wrap(core.DamageSkillWrapper)    # 43타
+        MemoryOfSourceEnd = core.DamageSkill("근원의 기억(종결)", 60, 1200 + 48 * LEVEL_MEM, 12 * 6).wrap(core.DamageSkillWrapper)
         MemoryOfSourceBuff = core.BuffSkill("근원의 기억(버프)", 0, 30 * 1000, cooltime = -1).wrap(core.BuffSkillWrapper) # 정신력 소모되지 않음
                 
-        InfinitySpell = core.BuffSkill("인피니티 스펠", 720, (40 + 2*vEhc.getV(0,0)) * 1000, cooltime = 240 * 1000, red=True).isV(vEhc,0,0).wrap(core.BuffSkillWrapper)
+        InfinitySpell = core.BuffSkill("인피니티 스펠", 720, (40 + 2*LEVEL_INF) * 1000, cooltime = 240 * 1000, red=True).isV(vEhc,0,0).wrap(core.BuffSkillWrapper)
         
-        DeviousNightmare = core.DamageSkill("새어 나오는 악몽", 0, 500 + 20*vEhc.getV(2,2), 9, cooltime = 10 * 1000, red=True).isV(vEhc,2,2).wrap(DeviousWrapper)
-        DeviousDream = core.DamageSkill("새어 나오는 흉몽", 0, 600 + 24*vEhc.getV(2,2), 9, cooltime = 10 * 1000, red=True).wrap(DeviousWrapper)
+        DeviousNightmare = core.DamageSkill("새어 나오는 악몽", 0, 500 + 20*LEVEL_DEV, 9, cooltime = 10 * 1000, red=True).isV(vEhc,2,2).wrap(DeviousWrapper)
+        DeviousDream = core.DamageSkill("새어 나오는 흉몽", 0, 600 + 24*LEVEL_DEV, 9, cooltime = 10 * 1000, red=True).wrap(DeviousWrapper)
 
         ForeverHungryBeastInit = core.DamageSkill("영원히 굶주리는 짐승(개시)", 540, 0, 0, cooltime=120*1000, red=True).isV(vEhc,0,0).wrap(core.DamageSkillWrapper)
         ForeverHungryBeastTrigger = core.DamageSkill("영원히 굶주리는 짐승(등장)", 0, 0, 0, cooltime=-1).isV(vEhc,0,0).wrap(core.DamageSkillWrapper)
-        ForeverHungryBeast = core.DamageSkill("영원히 굶주리는 짐승", 0, 400+16*vEhc.getV(0,0), 12, cooltime=-1).isV(vEhc,0,0).wrap(core.DamageSkillWrapper) # 20회 반복
+        ForeverHungryBeast = core.DamageSkill("영원히 굶주리는 짐승", 0, 400+16*LEVEL_FOR, 12, cooltime=-1).isV(vEhc,0,0).wrap(core.DamageSkillWrapper) # 20회 반복
 
         ### Skill Wrapper ###
 
@@ -339,7 +348,7 @@ class JobGenerator(ck.JobGenerator):
             skill.onBefore(core.OptionalElement(SpecterState.is_active, EndlessBadDream_Link, PlainChargeDrive_Link))
   
         # 보스 1:1 시 공격 1회 당 다가오는 죽음 1개 생성, 인피니티 스펠 상태 시 강화레벨에 따라 총 3 ~ 4개 생성
-        UpcomingDeath_Connected = core.OptionalElement(InfinitySpell.is_active, core.RepeatElement(UpcomingDeath, 3 + vEhc.getV(0,0) // 25), UpcomingDeath)
+        UpcomingDeath_Connected = core.OptionalElement(InfinitySpell.is_active, core.RepeatElement(UpcomingDeath, 3 + LEVEL_INF // 25), UpcomingDeath)
         UpcomingDeath.onAfter(ReturningHateStack.stackController(0.2))
         ReturningHate.onJustAfter(ReturningHateStack.stackController(-15))
         
@@ -521,15 +530,16 @@ class JobGenerator(ck.JobGenerator):
 
         DeviousNightmare.protect_from_running()
         DeviousDream.protect_from_running()
+        partySynergy = core.BuffSkill("파티 시너지", 0, 30 * 1000, pdamage_indep=30 ,cooltime = 240 * 1000, red=True).wrap(core.BuffSkillWrapper)
 
         return(
             PlainAttack, 
             [
                 globalSkill.maple_heros(chtr.level, name = "레프의 용사", combat_level=self.combat), globalSkill.useful_sharp_eyes(), globalSkill.useful_combat_orders(),
                 ContactCaravan, Booster, LuckyDice, ScarletBuff, AbyssBuff, SpecterState, ScarletBuff2, AbyssBuff2,
-                ChargeSpellAmplification, WraithOfGod, InfinitySpell, MagicCircuitFullDrive, FloraGoddessBless, Overdrive, 
+                ChargeSpellAmplification, WraithOfGod, InfinitySpell, MagicCircuitFullDrive, FloraGoddessBless, Overdrive, #partySynergy,
                 MemoryOfSourceBuff, EndlessPainBuff,
-                globalSkill.soul_contract()
+                globalSkill.soul_contract(), #seedrings.restraint_ring(3),
             ]
             + [RaptRestrictionEnd, ForeverHungryBeastTrigger]  # reserved task, use as early as possible
             + [
